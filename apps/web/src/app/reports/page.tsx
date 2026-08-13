@@ -11,7 +11,7 @@ import {
 import { DashboardLayout } from '@/components/DashboardLayout';
 export const dynamic = "force-dynamic";
 import { useBusinessData } from '@/context/BusinessDataContext';
-import { queryAIAnalyst } from '@/services/api';
+import { queryAIAnalyst } from '@/api-client/api';
 
 export default function ReportsPage() {
   const { data } = useBusinessData();

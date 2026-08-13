@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "npx tsx scripts/check-db.ts",
-    "dev": "npx tsx scripts/dev.ts",
+    "predev": "npx tsx ../../scripts/check-db.ts",
+    "dev": "npx tsx ../../scripts/dev.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -40,8 +40,5 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
     "typescript": "^5"
-  },
-  "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
   }
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Activity, Clock, CheckCircle2, ShieldAlert } from 'lucide-react';
-import { TimelineEntry } from '@/lib/services/TimelineService';
+import { TimelineEntry } from '@/lib/domain/TimelineService';
 
 export const ExecutiveTimelineFeed: React.FC = () => {
   const [timeline, setTimeline] = useState<TimelineEntry[]>([]);

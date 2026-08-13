@@ -8,7 +8,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { StatCard } from './ui/stat-card';
-import { DashboardData } from '../services/api';
+import { DashboardData } from '../api-client/api';
 
 interface KPISectionProps {
   data: DashboardData;

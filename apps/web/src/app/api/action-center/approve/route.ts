@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ActionCenterService } from '@/lib/services/ActionCenterService';
+import { ActionCenterService } from '@/lib/domain/ActionCenterService';
 
 export const dynamic = "force-dynamic";
 

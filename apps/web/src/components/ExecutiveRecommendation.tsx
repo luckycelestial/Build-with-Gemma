@@ -8,7 +8,7 @@ import {
   Bookmark,
   Info
 } from 'lucide-react';
-import { DashboardData } from '../services/api';
+import { DashboardData } from '../api-client/api';
 
 interface ExecutiveRecommendationProps {
   data: DashboardData;

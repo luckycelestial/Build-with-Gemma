@@ -16,7 +16,7 @@ import {
   ArrowRight,
   ShieldCheck
 } from 'lucide-react';
-import { DashboardData } from '../services/api';
+import { DashboardData } from '../api-client/api';
 
 interface CustomerIntelligenceProps {
   data: DashboardData;

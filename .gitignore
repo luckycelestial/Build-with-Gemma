@@ -14,7 +14,9 @@
 /coverage
 
 # next.js
+.next/
 /.next/
+apps/web/.next/
 /out/
 
 # production
@@ -46,4 +48,9 @@ next-env.d.ts
 *.db
 *.sqlite
 whatsapp_session.db
+
+# python & scratch
+__pycache__/
+*.pyc
+/scratch/
 

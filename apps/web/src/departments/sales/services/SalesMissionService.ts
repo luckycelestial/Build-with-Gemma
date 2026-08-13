@@ -18,7 +18,7 @@
 import { SalesMissionRepository, SalesMissionEntity } from '../repositories/SalesMissionRepository';
 import { CustomerRepository, CustomerMasterItem } from '../repositories/CustomerRepository';
 import { SalesOrderRepository } from '../repositories/SalesOrderRepository';
-import { CommunicationService } from '@/lib/services/CommunicationService';
+import { CommunicationService } from '@/lib/domain/CommunicationService';
 import { BusinessEventBus } from '@/lib/events/BusinessEventBus';
 
 export class SalesMissionService {

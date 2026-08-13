@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { OperationService } from '@/lib/operations/OperationService';
-import { ActionCenterService } from '@/lib/services/ActionCenterService';
-import { TimelineService } from '@/lib/services/TimelineService';
+import { ActionCenterService } from '@/lib/domain/ActionCenterService';
+import { TimelineService } from '@/lib/domain/TimelineService';
 import { WorkflowService } from '@/lib/workflows/WorkflowService';
 import { BusinessStoryEngine } from '@/lib/story/BusinessStoryEngine';
 

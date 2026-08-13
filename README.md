@@ -1,160 +1,230 @@
-# Mission-OS ERP — Monorepo Architecture & Database Guide
+<div align="center">
 
-Production-grade, mission-driven Enterprise Resource Planning (ERP) platform built with Next.js, Supabase PostgreSQL, Prisma ORM, and WhatsApp Real-time Integration.
+# ⚡ FinCent — AI CTO Manufacturing Operations OS
 
-## 🏗️ Monorepo Structure
+### *Autonomous AI Operations Team & Executive AI CTO for SME Precision Manufacturers*
 
-The project is structured as an npm workspace monorepo:
+[![Built with Gemma](https://img.shields.io/badge/Built%20With-Gemma%20AI-blueviolet?style=for-the-badge&logo=google)](https://ai.google.dev/gemma)
+[![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-PostgreSQL-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
 
-```text
-mission-os/
-│
-├── apps/
-│   ├── web/                 # Primary Next.js ERP application (@mission-os/web)
-│   ├── admin/               # Admin dashboard (future)
-│   └── mobile/              # Field operations mobile app (future)
-│
-├── packages/
-│   ├── database/            # Shared Prisma Client wrapper (@mission-os/database)
-│   └── shared/              # Domain types and constants (@mission-os/shared)
-│
-├── prisma/
-│   └── schema.prisma        # Shared Supabase PostgreSQL schema
-│
-├── .gitignore               # Strict git hygiene configuration
-├── package.json             # Root npm workspace manifest
-└── README.md                # Project documentation
+---
+
+<img src="docs/screenshots/control-room.png" alt="FinCent Executive Control Room" width="100%" />
+
+</div>
+
+## 🌟 Executive Summary
+
+**FinCent** transforms SME manufacturing businesses from manual, fragmented dashboard checking into an **autonomous, self-coordinating AI Operations Team led by an Executive AI CTO**.
+
+Rather than presenting static analytics, FinCent continuously:
+* 📡 **Observes Business Events** — Inflation surges, inventory stockouts, WhatsApp supplier quotes, invoice delays.
+* 🤖 **Evaluates Operating SOPs** — Dynamically matches business events to operational Standard Operating Procedures.
+* ⚡ **Plans & Coordinates DAG Workflows** — Delegates execution to specialized AI Worker Managers.
+* 🛡️ **Requests 1-Click Owner Approvals** — Pauses critical monetary & binding steps until the owner approves via web or WhatsApp.
+* 🔨 **Executes Verified Business Tools** — Modifies Tally ERP ledgers, creates purchase orders, and dispatches supplier RFQs via 43 registered tools.
+* 📊 **Reports Financial Outcomes** — Quantifies daily margin protected, stockouts prevented, and hours saved.
+
+---
+
+## 📸 Product Experience Gallery
+
+### 1. Executive Control Room & Pitch Demo Simulator
+*Simulate a live manufacturing business day in 120 seconds with real-time DAG progression across all worker nodes.*
+
+![FinCent Control Room](docs/screenshots/control-room.png)
+
+---
+
+### 2. Onboarding Wizard
+*Tailor Gemma intelligence to your exact tracking methods (Notebook, Excel spreadsheets, or Tally ERP).*
+
+![Onboarding Setup](docs/screenshots/onboarding.png)
+
+---
+
+### 3. Business Operations OS Hub (`/operations`)
+*Unified operational command center listing 8 active domain worker nodes, running DAG graphs, and audit trails.*
+
+![Operations OS](docs/screenshots/operations.png)
+
+---
+
+### 4. Pricing & Margin Defense (`/pricing-agent`)
+*Defends product gross margin corridors against raw material price spikes with automated BOM surcharge pass-through.*
+
+![Pricing Defense](docs/screenshots/pricing_agent.png)
+
+---
+
+### 5. Supplier RFQ & Procurement (`/supplier-agent`)
+*Automates supplier quote requests, vendor lead-time comparisons, and OCR invoice parsing.*
+
+![Supplier Procurement](docs/screenshots/supplier-rfq.png)
+
+---
+
+### 6. Accounts Receivable & Collections (`/collections-agent`)
+*Aging ledger analysis with automated AI collection outreach generator (Gentle / Professional / Firm tones).*
+
+![Collections AR](docs/screenshots/collections-ar.png)
+
+---
+
+### 7. Revenue Intelligence & SHAP Explainability (`/revenue-intelligence`)
+*Time-series XGBoost ML predictions with 8-week forecasting and SHAP feature waterfall attribution.*
+
+![Revenue Intelligence](docs/screenshots/revenue-forecast.png)
+
+---
+
+### 8. Market Intelligence & Commodity News Crawler (`/market-intelligence`)
+*Real-time RSS news crawler indexing Peenya cluster steel spot prices, aluminum indices, and power tariffs.*
+
+![Market Signals](docs/screenshots/market-signals.png)
+
+---
+
+### 9. Customer Credit & Concentration Matrix (`/customer-intelligence`)
+*Customer concentration analysis, credit policy recommendations, and payment delay risk badges.*
+
+![Customer Intelligence](docs/screenshots/customer-intelligence.png)
+
+---
+
+### 10. Executive Reports Center (`/reports`)
+*Automated PDF executive briefing memo generator compiling 8 operation summaries into print-ready reports.*
+
+![Reports Center](docs/screenshots/reports-center.png)
+
+---
+
+### 11. AI CFO Consultation Chat (`/ask-ai-cfo`)
+*Interactive financial copilot streaming responses from local Ollama (`gemma4:cloud`) models.*
+
+![AI CFO Chat](docs/screenshots/ai-cfo-chat.png)
+
+---
+
+### 12. What-If Machine & Margin Simulator (`/what-if-simulator`)
+*Interactive scenario sliders for raw material costs, customer order multipliers, and machine capacity utilization.*
+
+![What-If Simulator](docs/screenshots/what-if-simulator.png)
+
+---
+
+### 13. Executive AI CTO Advisory Board (`/executive-advisor`)
+*Strategic operational decision checklists correlated across internal sales ledgers and external market signals.*
+
+![Executive Advisor](docs/screenshots/executive-advisor.png)
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+                      +----------------------------------+
+                      |       Business Event Stream      |
+                      |  (News, Invoices, WhatsApp, ERP) |
+                      +-----------------+----------------+
+                                        |
+                                        v
+                      +-----------------+----------------+
+                      |        Executive AI CTO          |
+                      |   (Gemma LLM Reasoning Layer)    |
+                      +-----------------+----------------+
+                                        |
+                                        v
+                      +-----------------+----------------+
+                      |     SOP Evaluation & Matcher     |
+                      +-----------------+----------------+
+                                        |
+                                        v
+                      +-----------------+----------------+
+                      |     Workflow Engine (DAGs)       |
+                      +-------+------------------+-------+
+                              |                  |
+                              v                  v
+                 +------------+---+          +---+------------+
+                 | Autonomous     |          | Owner Approval |
+                 | Step Execution |          | Gate (1-Click) |
+                 +------------+---+          +---+------------+
+                              |                  |
+                              +--------+---------+
+                                       |
+                                       v
+                      +----------------+-----------------+
+                      |    Capability Tool Registry      |
+                      |      (43 Business Tools)         |
+                      +----------------+-----------------+
+                                       |
+                                       v
+                      +----------------+-----------------+
+                      |   Tally ERP / WhatsApp / Database|
+                      +----------------------------------+
 ```
 
 ---
 
-## 🛢️ Database Layer (Supabase PostgreSQL & Prisma ORM)
+## 🚀 Quick Start Guide
 
-All persistence has been migrated from local JSON files to PostgreSQL. The schema includes:
+### 1. Prerequisites
+* **Node.js**: `v20.0.0+`
+* **PostgreSQL**: PostgreSQL database instance running locally or hosted.
+* **Ollama**: Local Ollama server running with `gemma4:cloud` or `gemma:7b`.
 
-- **`ProcurementMission`**: Primary source of truth for raw material restock missions.
-- **`MissionParticipant`**: Eligible suppliers invited to participate in active missions.
-- **`QuoteRecord`**: Supplier quotations received deterministically via WhatsApp.
-- **`PurchaseOrderRecord`**: Approved POs dispatched to selected winning suppliers.
-- **`RFQRecord`**: Corporate RFQ letter dispatch logs.
-- **`BusinessEvent`**: System-wide audit logs and event notifications.
-- **`Supplier`**: ERP Master vendor registry with manual `whatsappJid` mapping.
-- **`InventoryItem`**: Real-time warehouse inventory balances and threshold alerts.
+### 2. Environment Setup
+Create a `.env` file in the root directory:
 
----
-
-## 🚀 Quick Start (Local Setup)
-
-### 1. Install Dependencies
-Run from the workspace root:
-```bash
-npm install
-```
-
-### 2. Configure Environment Variables
-Create a `.env` file in `apps/web/.env`:
 ```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/revenue_intelligence"
-PORT=3000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/revenue_agent"
+OLLAMA_BASE_URL="http://localhost:11434"
+OLLAMA_MODEL="gemma4:cloud"
+PORT=5000
 ```
 
-### 3. Sync Database Schema
+### 3. Installation & Database Migration
 ```bash
-npm run prisma:push
+# Install dependencies
+npm install
+
+# Push Prisma schema to PostgreSQL
+npx prisma db push
+
+# Generate Prisma client
+npx prisma generate
 ```
 
-### 4. Run Development Server
+### 4. Running the Development Server
 ```bash
 npm run dev
 ```
-
-### 5. Build for Production
-```bash
-npm run build
-```
+Open **`http://localhost:5000`** in your browser.
 
 ---
 
-## 🔒 Security & Git Hygiene
+## 🧪 Integration Verification
 
-The repository enforces strict `.gitignore` patterns:
-- SQLite/database files (`*.db`, `*.sqlite`, `whatsapp_session.db`) are ignored.
-- Authentication sessions (`auth/`, `sessions/`) and `.env` secrets are never committed.
-
----
-
-## 🤖 Build With Gemma — System Architecture & WhatsApp AI Integration
-
-```
-                       ┌────────────────────────────────────────┐
-                       │           USER BROWSER / UI            │
-                       │     (Next.js 15 App Router / React 19) │
-                       └───────────────────┬────────────────────┘
-                                           │ HTTP / REST API
-                                           ▼
-                       ┌────────────────────────────────────────┐
-                       │           NEXT.JS API ROUTES           │
-                       │      (/api/procurement, /api/whatsapp) │
-                       └───────────┬────────────────┬───────────┘
-                                   │                │
-           ┌───────────────────────┘                └────────────────────────┐
-           ▼                                                                 ▼
-┌──────────────────────────┐                                     ┌──────────────────────────┐
-│  Procurement Services    │                                     │    PostgreSQL Database   │
-│  - Mission Engine        │                                     │  (Prisma ORM Persistence)│
-│  - Resolution Engine     │◄───────────────────────────────────►│ - ProcurementMission     │
-│  - Quotation Analyzer    │                                     │ - MissionParticipant     │
-│  - Event Bus             │                                     │ - Supplier Master        │
-└──────────┬───────────────┘                                     │ - QuoteRecord / RFQRecord│
-           │                                                     └──────────────────────────┘
-           ▼
-┌──────────────────────────┐
-│  Communication Gateway   │
-│  - CommunicationService  │
-└──────────┬───────────────┘
-           │ Webhook HTTP POST (port 5000 / 3000)
-           ▼
-┌────────────────────────────────────────────────────────┐
-│     GO-NEONIZE PYTHON DAEMON (FinCent_onborading)      │
-│  - WebSocket client connection to web.whatsapp.com     │
-│  - Handles JID resolution & message routing            │
-└──────────────────────────┬─────────────────────────────┘
-                           │ WhatsApp Web WebSocket
-                           ▼
-                  ┌─────────────────┐
-                  │ WHATSAPP CLOUD  │
-                  └─────────────────┘
-```
-
-### Architecture Breakdown
-
-1. **Frontend App (`apps/web`)**:
-   - Built using **Next.js 15.5 App Router**, **React 19**, and **Vanilla CSS**.
-   - Interfaces for **Supplier Agent**, **Ask AI CFO**, **Collections Agent**, **Revenue Intelligence**, **What-If Simulator**, and **Executive Advisor**.
-   - Automated 4-second polling for active procurement missions, WhatsApp conversation streams, and supplier master updates.
-
-2. **Backend & Business Logic (`apps/web/src/departments/procurement`)**:
-   - **`ProcurementMissionService`**: Executes mission workflow transitions (`Mission_Created` ➔ `Waiting_for_Quotations` ➔ `Quotation_Comparison` ➔ `Owner_Approval` ➔ `Purchase_Order` ➔ `Mission_Complete`).
-   - **`CommunicationService`**: Manages incoming/outgoing WhatsApp message routing, JID resolution, supplier participant matching, and historical message filtering.
-   - **`QuotationAnalyzer`**: Extracts prices, delivery days, and terms from unstructured WhatsApp messages using AI heuristics to rank suppliers.
-
-3. **Database & Persistence (`Prisma ORM` + `PostgreSQL`)**:
-   - `ProcurementMission`: Mission stage, status, context snapshots, and milestones.
-   - `Supplier`: Master database of suppliers with names, phone numbers, WhatsApp JIDs, and materials.
-   - `MissionParticipant`: Maps eligible suppliers to active procurement missions.
-   - `QuoteRecord` & `RFQRecord`: Historical log of dispatches and received quotations.
-
-4. **WhatsApp Communication Daemon (`FinCent_onborading/whatsapp.py`)**:
-   - Python client daemon built on Go-Neonize bindings.
-   - Handles network reconnection loops and forwards incoming messages via HTTP POST to `/api/whatsapp/receive`.
-
----
-
-## 🧪 Verification & Manual Testing
-
-Run the manual verification test to check JID resolution, quote ingestion, and state machine completion:
+Run the comprehensive end-to-end scratchpad test suite:
 
 ```bash
-cd apps/web
-npx tsx scripts/test-manual-whatsapp-jid-supplier-resolution.ts
+npx tsx scripts/test-scratchpad-features.ts
 ```
+
+This verifies:
+* ✅ 43 Business Capability Tools
+* ✅ 8 Business Operations & DAG Execution
+* ✅ Action Center 1-Click Approvals
+* ✅ 8 Domain Worker Agents
+* ✅ Real-time Story Engine & 120s Startup Pitch Simulator
+
+---
+
+<div align="center">
+
+**FinCent AI CTO Platform** — *Evolving SME Manufacturing from Dashboards to Autonomous AI Execution.*
+
+</div>

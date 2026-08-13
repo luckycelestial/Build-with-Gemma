@@ -11,27 +11,13 @@
     "dev": "npm --prefix apps/web run dev",
     "build": "npm --prefix apps/web run build",
     "start": "npm --prefix apps/web run start",
-    "lint": "npm --prefix apps/web run lint"
-  },
-  "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "lucide-react": "^1.25.0",
-    "next": "16.2.10",
-    "pg": "^8.22.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "lint": "npm --prefix apps/web run lint",
+    "prisma:generate": "npm --prefix packages/database run db:generate",
+    "prisma:push": "npm --prefix packages/database run db:push",
+    "prisma:seed": "npm --prefix packages/database run db:seed"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/pg": "^8.20.0",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.10",
-    "prisma": "^7.8.0",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

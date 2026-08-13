@@ -1,6 +1,6 @@
 import { ExecutiveCTOAgent } from '../agents/ExecutiveCTOAgent';
 import { ProcurementWorker } from '../agents/workers/ProcurementWorker';
-import { ActionCenterService } from '../services/ActionCenterService';
+import { ActionCenterService } from '../domain/ActionCenterService';
 import { BusinessEventBus } from '../events/BusinessEventBus';
 
 export interface DemoStepStatus {

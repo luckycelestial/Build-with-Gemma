@@ -7,7 +7,7 @@ import {
   getSectionExplanation,
   DashboardData,
   DEFAULT_DASHBOARD_DATA
-} from '../services/api';
+} from '../api-client/api';
 
 interface BusinessDataContextProps {
   data: DashboardData | null;

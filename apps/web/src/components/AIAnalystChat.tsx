@@ -7,8 +7,8 @@ import {
   Bot, 
   MessageSquare
 } from 'lucide-react';
-import { queryAIAnalyst } from '../services/api';
-import type { DashboardData } from '../services/api';
+import { queryAIAnalyst } from '../api-client/api';
+import type { DashboardData } from '../api-client/api';
 import { WhatsAppContinuationBanner } from './chat/WhatsAppContinuationBanner';
 import { ContinueOnWhatsAppButton } from './chat/ContinueOnWhatsAppButton';
 

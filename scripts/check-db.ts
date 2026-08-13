@@ -2,8 +2,9 @@ import { Client } from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load environmental variables from the .env file in the nested project folder
+// Load environmental variables from the .env
 dotenv.config({ path: path.join(__dirname, '../.env') });
+dotenv.config({ path: path.join(__dirname, '../apps/web/.env') });
 
 const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/revenue_intelligence?schema=public";
 

@@ -13,11 +13,12 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  const samplePath = path.join(process.cwd(), 'ml/sample_data.csv');
+  const mlDir = process.env.ML_ENGINE_DIR || path.resolve(process.cwd(), '../../services/ml-engine');
+  const samplePath = path.join(mlDir, 'sample_data.csv');
   
   // Verify sample data exists. If not, auto generate it using Python script
   if (!fs.existsSync(samplePath)) {
-    const pythonScript = path.join(process.cwd(), 'ml/analyze.py');
+    const pythonScript = path.join(mlDir, 'analyze.py');
     await new Promise<void>((resolve) => {
       exec(`python "${pythonScript}" --generate-only`, () => resolve());
     });

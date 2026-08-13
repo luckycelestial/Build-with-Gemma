@@ -1,0 +1,9 @@
+{
+  "name": "@services/ml-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Python analytics and revenue ML prediction microservice",
+  "scripts": {
+    "analyze": "python analyze.py"
+  }
+}

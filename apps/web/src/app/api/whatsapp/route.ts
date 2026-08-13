@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ConversationService } from '@/lib/services/ConversationService';
+import { ConversationService } from '@/lib/domain/ConversationService';
 import { ProcurementCommunicationGateway } from '@/departments/procurement/services/ProcurementCommunicationGateway';
 
 export const dynamic = "force-dynamic";

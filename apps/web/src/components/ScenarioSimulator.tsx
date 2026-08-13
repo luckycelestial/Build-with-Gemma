@@ -7,8 +7,8 @@ import {
   Info,
   Loader2
 } from 'lucide-react';
-import type { DashboardData } from '../services/api';
-import { runSimulation } from '../services/api';
+import type { DashboardData } from '../api-client/api';
+import { runSimulation } from '../api-client/api';
 
 interface ScenarioSimulatorProps {
   data: DashboardData;

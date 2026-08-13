@@ -1,7 +1,7 @@
 import { OperationService } from '../operations/OperationService';
 import { WorkflowService } from '../workflows/WorkflowService';
 import { KnowledgeBaseService } from '../knowledge/KnowledgeBaseService';
-import { BusinessContextService } from '../services/BusinessContextService';
+import { BusinessContextService } from '../domain/BusinessContextService';
 
 export interface LayeredBusinessMemory {
   globalProfile: {

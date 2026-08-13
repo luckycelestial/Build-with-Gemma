@@ -13,7 +13,7 @@ import {
   BookOpen,
   Newspaper,
 } from 'lucide-react';
-import { DashboardData } from '../services/api';
+import { DashboardData } from '../api-client/api';
 
 interface RevenueIntelligenceProps {
   data: DashboardData;

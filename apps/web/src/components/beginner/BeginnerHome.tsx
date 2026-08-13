@@ -12,7 +12,7 @@ import {
   Package,
   BookOpen
 } from 'lucide-react';
-import { DashboardData } from '@/services/api';
+import { DashboardData } from '@/api-client/api';
 import { useBusinessData } from '@/context/BusinessDataContext';
 
 interface BeginnerHomeProps {

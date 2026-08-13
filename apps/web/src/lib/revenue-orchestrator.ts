@@ -221,7 +221,7 @@ export const FALLBACK_NEWS = [
 
 export function runPythonAnalysis(filePath: string, ordersMult = 1.0, steelMult = 1.0, delayMod = 0.0, utilMult = 1.0): Promise<any> {
   return new Promise((resolve, reject) => {
-    const pythonScript = path.join(process.cwd(), 'ml/analyze.py');
+    const pythonScript = process.env.ML_ENGINE_SCRIPT_PATH || path.resolve(process.cwd(), '../../services/ml-engine/analyze.py');
     let command = `python "${pythonScript}" "${filePath}"`;
     if (ordersMult !== 1.0) command += ` --orders-mult ${ordersMult}`;
     if (steelMult !== 1.0) command += ` --steel-mult ${steelMult}`;

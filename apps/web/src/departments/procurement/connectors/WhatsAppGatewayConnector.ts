@@ -11,7 +11,7 @@
  * ============================================================================
  */
 
-import { CommunicationService } from '@/lib/services/CommunicationService';
+import { CommunicationService } from '@/lib/domain/CommunicationService';
 
 export interface TransportMessageResult {
   success: boolean;

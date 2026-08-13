@@ -1,6 +1,6 @@
 import { BaseTool } from './BaseTool';
 import { BusinessToolMetadata, ToolExecutionContext } from './types';
-import { queryAIAnalyst } from '@/services/api';
+import { queryAIAnalyst } from '@/api-client/api';
 import { BusinessEvent } from '../events/BusinessEventBus';
 
 // --- 1. Generate Report Tool ---
