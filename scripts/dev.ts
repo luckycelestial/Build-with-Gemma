@@ -5,7 +5,6 @@ import path from 'path';
 import { Client } from 'pg';
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
-dotenv.config({ path: path.join(__dirname, '../apps/web/.env') });
 
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "gemma4:cloud";
 let ollamaProcess: ChildProcess | null = null;
