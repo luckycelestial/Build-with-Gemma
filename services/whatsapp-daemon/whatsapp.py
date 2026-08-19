@@ -15,6 +15,8 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
+import queue
+
 # Global State
 whatsapp_state = {
     "connected": False,
@@ -24,6 +26,40 @@ whatsapp_state = {
 
 CLIENT_DB_PATH = os.path.join(os.path.dirname(__file__), "whatsapp_session.db")
 client = NewClient(CLIENT_DB_PATH)
+
+outbound_queue = queue.Queue()
+
+def outbound_worker():
+    while True:
+        try:
+            item = outbound_queue.get()
+            if item is None:
+                break
+            target_jid_obj, text_body, raw_user = item
+            attempt = 1
+            max_attempts = 5
+            while attempt <= max_attempts:
+                try:
+                    client.send_message(target_jid_obj, text_body)
+                    print(f"\n📤 [OUTGOING WA MESSAGE SENT] To: {raw_user}@s.whatsapp.net | Text: '{text_body[:60]}...'")
+                    break
+                except Exception as send_err:
+                    err_str = str(send_err)
+                    if "doesn't contain a device JID" in err_str or "not logged in" in err_str.lower():
+                        whatsapp_state["connected"] = False
+                        print(f"❌ [OUTGOING WA ERROR] WhatsApp account is not linked yet ({err_str}). Please scan QR Code in Web UI!")
+                        break
+                    print(f"⚠️ [OUTGOING WA RETRY] Attempt {attempt}/{max_attempts} failed ({send_err}). Retrying in 2s...")
+                    attempt += 1
+                    time.sleep(2)
+            
+            # Pacing gap between sequential messages to prevent socket congestion / rate limits
+            time.sleep(1.5)
+            outbound_queue.task_done()
+        except Exception as q_err:
+            print(f"❌ [OUTBOUND QUEUE ERROR] {q_err}")
+
+threading.Thread(target=outbound_worker, daemon=True).start()
 
 def setup_client_events(cl):
     @cl.event(QREv)
@@ -157,22 +193,8 @@ class DaemonHTTPHandler(BaseHTTPRequestHandler):
 
                 jid_obj = build_jid(raw_user, "s.whatsapp.net")
 
-                def dispatch_msg(target_jid_obj, text_body, attempt=1):
-                    try:
-                        client.send_message(target_jid_obj, text_body)
-                        print(f"\n📤 [OUTGOING WA MESSAGE SENT] To: {raw_user}@s.whatsapp.net | Text: '{text_body}'")
-                    except Exception as send_err:
-                        err_str = str(send_err)
-                        if "doesn't contain a device JID" in err_str or "not logged in" in err_str.lower():
-                            whatsapp_state["connected"] = False
-                            print(f"❌ [OUTGOING WA ERROR] WhatsApp account is not linked yet ({err_str}). Please scan QR Code in Web UI!")
-                            return
-                        print(f"⚠️ [OUTGOING WA RETRY] Attempt {attempt} failed: {send_err}")
-                        if attempt <= 3:
-                            time.sleep(3)
-                            dispatch_msg(target_jid_obj, text_body, attempt + 1)
-
-                threading.Thread(target=dispatch_msg, args=(jid_obj, message_text), daemon=True).start()
+                outbound_queue.put((jid_obj, message_text, raw_user))
+                print(f"📥 [OUTBOUND ENQUEUED] Target: {raw_user}@s.whatsapp.net | Queue size: {outbound_queue.qsize()}")
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
