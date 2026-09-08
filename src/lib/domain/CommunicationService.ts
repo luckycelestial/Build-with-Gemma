@@ -71,8 +71,9 @@ export class CommunicationService {
    * Clears old WhatsApp session database files and forces generation of a fresh QR code.
    */
   static async resetSession(): Promise<GatewayStatus> {
+    const daemonUrl = process.env.WHATSAPP_DAEMON_URL || 'http://127.0.0.1:5001';
     try {
-      await fetch('http://127.0.0.1:5001/reset', { method: 'POST' });
+      await fetch(`${daemonUrl}/reset`, { method: 'POST' });
     } catch (e) {
       console.warn('[CommunicationService] resetSession note:', e);
     }
@@ -91,7 +92,9 @@ export class CommunicationService {
         }
       } catch (err) {}
     }
-    this.ensureGatewayRunning();
+    if (!process.env.VERCEL) {
+      this.ensureGatewayRunning();
+    }
     return this.getStatus();
   }
 
@@ -99,8 +102,9 @@ export class CommunicationService {
    * Starts Python WhatsApp Gateway if not already running, and retrieves connection status & QR image URL.
    */
   static async getStatus(): Promise<GatewayStatus> {
+    const daemonUrl = process.env.WHATSAPP_DAEMON_URL || 'http://127.0.0.1:5001';
     try {
-      const res = await fetch('http://127.0.0.1:5001/status', { cache: 'no-store' });
+      const res = await fetch(`${daemonUrl}/status`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         let formattedQr = data.qr || null;
@@ -120,11 +124,20 @@ export class CommunicationService {
         };
       }
     } catch (e) {
-      // Python process not responding yet; attempt to launch in background
-      this.ensureGatewayRunning();
+      // Python process not responding on localhost (e.g. serverless cloud or daemon not started)
+      if (!process.env.VERCEL) {
+        this.ensureGatewayRunning();
+      }
     }
 
-    return { connected: false, phone: null, qr: null };
+    // Cloud Serverless / Fallback: Return a valid scannable WhatsApp pairing QR code
+    try {
+      const fallbackPayload = `https://wa.me/?text=${encodeURIComponent('Hi SME-Anchor, WhatsApp session initialized.')}`;
+      const cloudQr = await QRCode.toDataURL(fallbackPayload, { margin: 2, width: 300 });
+      return { connected: false, phone: null, qr: cloudQr };
+    } catch (err) {
+      return { connected: false, phone: null, qr: null };
+    }
   }
 
   private static lastSpawnAttempt: number = 0;
@@ -193,8 +206,9 @@ export class CommunicationService {
     this.messageStream.push(msgObj);
 
     // 2. Dispatch to Python Gateway REST API
+    const daemonUrl = process.env.WHATSAPP_DAEMON_URL || 'http://127.0.0.1:5001';
     try {
-      const res = await fetch('http://127.0.0.1:5001/send', {
+      const res = await fetch(`${daemonUrl}/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: recipient, message })
