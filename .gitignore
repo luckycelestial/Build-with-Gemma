@@ -18,6 +18,8 @@
 /.next/
 apps/web/.next/
 /out/
+build/
+dist/
 
 # production
 /build

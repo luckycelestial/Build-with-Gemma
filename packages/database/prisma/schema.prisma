@@ -232,7 +232,7 @@ model ProcurementMission {
   startedAt      String
   context        Json                   // Complete mission context snapshot
   createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+  updatedAt      DateTime               @default(now()) @updatedAt
   participants   MissionParticipant[]
   quotes         QuoteRecord[]
   purchaseOrders PurchaseOrderRecord[]
