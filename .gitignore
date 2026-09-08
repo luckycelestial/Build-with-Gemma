@@ -46,11 +46,16 @@ next-env.d.ts
 
 # database sessions & sqlite
 *.db
+*.db*
 *.sqlite
-whatsapp_session.db
+whatsapp_session.db*
 
 # python & scratch
+.venv/
 __pycache__/
 *.pyc
+*.pyo
 /scratch/
+*.tmp
+*.log
 

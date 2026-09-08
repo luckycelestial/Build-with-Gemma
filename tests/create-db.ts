@@ -1,6 +1,10 @@
 import { Client } from 'pg';
+import dotenv from 'dotenv';
+import path from 'path';
 
-const connectionString = "postgresql://postgres:salmon%4011@localhost:5432/postgres";
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/postgres";
 
 async function createDatabase() {
   const client = new Client({ connectionString });

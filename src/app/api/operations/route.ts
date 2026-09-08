@@ -27,3 +27,17 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch operations: " + error.message }, { status: 500 });
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    const operations = await OperationService.getOperationsOverview();
+    const actionCenter = ActionCenterService.getActionCenterState();
+    return NextResponse.json({
+      success: true,
+      operations,
+      actionCenter
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: "Failed to handle operations POST: " + error.message }, { status: 500 });
+  }
+}

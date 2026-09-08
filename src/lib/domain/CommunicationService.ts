@@ -16,6 +16,8 @@
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import QRCode from 'qrcode';
+import { getPythonExecutable } from '../python';
 import { ProcurementMissionService } from '@/features/procurement/services/ProcurementMissionService';
 
 export interface GatewayStatus {
@@ -68,9 +70,6 @@ export class CommunicationService {
   /**
    * Clears old WhatsApp session database files and forces generation of a fresh QR code.
    */
-  /**
-   * Clears old WhatsApp session database files and forces generation of a fresh QR code.
-   */
   static async resetSession(): Promise<GatewayStatus> {
     try {
       await fetch('http://127.0.0.1:5001/reset', { method: 'POST' });
@@ -82,6 +81,15 @@ export class CommunicationService {
         this.pythonProcess.kill();
       } catch (e) {}
       this.pythonProcess = null;
+    }
+    const cwd = process.cwd();
+    const sessionDb = path.resolve(cwd, 'services', 'whatsapp-daemon', 'whatsapp_session.db');
+    for (const ext of ['', '-wal', '-shm', '-journal']) {
+      try {
+        if (fs.existsSync(sessionDb + ext)) {
+          fs.unlinkSync(sessionDb + ext);
+        }
+      } catch (err) {}
     }
     this.ensureGatewayRunning();
     return this.getStatus();
@@ -97,8 +105,12 @@ export class CommunicationService {
         const data = await res.json();
         let formattedQr = data.qr || null;
 
-        if (formattedQr && !formattedQr.startsWith('data:') && !formattedQr.startsWith('http')) {
-          formattedQr = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(formattedQr)}`;
+        if (formattedQr && !formattedQr.startsWith('data:image')) {
+          try {
+            formattedQr = await QRCode.toDataURL(formattedQr, { margin: 2, width: 300 });
+          } catch (qrErr) {
+            console.warn('[CommunicationService] QRCode toDataURL error:', qrErr);
+          }
         }
 
         return {
@@ -125,7 +137,8 @@ export class CommunicationService {
     console.log(`🚀 [CommunicationService] Launching Python WhatsApp Gateway daemon: ${scriptPath}`);
 
     try {
-      this.pythonProcess = spawn('python', [scriptPath], {
+      const pythonExe = getPythonExecutable();
+      this.pythonProcess = spawn(pythonExe, [scriptPath], {
         cwd: path.dirname(scriptPath),
         stdio: 'inherit',
         detached: false

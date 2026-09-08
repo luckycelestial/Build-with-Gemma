@@ -180,10 +180,17 @@ Rather than presenting static analytics, FinCent continuously:
 Create a `.env` file in the root directory:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/revenue_agent"
-OLLAMA_BASE_URL="http://localhost:11434"
-OLLAMA_MODEL="gemma4:cloud"
-PORT=5000
+# Supabase Database Configuration
+DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
+
+# Supabase Client configuration
+NEXT_PUBLIC_SUPABASE_URL="https://[PROJECT-REF].supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="sb_publishable_..."
+
+# AI Engine (Groq LPU API)
+GROQ_API_KEY="gsk_..."
+GROQ_MODEL="qwen/qwen3.8-27b"
 ```
 
 ### 3. Installation & Database Migration
@@ -191,11 +198,11 @@ PORT=5000
 # Install dependencies
 npm install
 
-# Push Prisma schema to PostgreSQL
-npx prisma db push
+# Push Prisma schema to Supabase
+npm run prisma:push
 
 # Generate Prisma client
-npx prisma generate
+npm run prisma:generate
 ```
 
 ### 4. Running the Development Server

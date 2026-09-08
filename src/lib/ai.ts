@@ -13,7 +13,7 @@
 import OpenAI from "openai";
 
 export const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
-export const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+export const GROQ_MODEL = process.env.GROQ_MODEL || "qwen/qwen3.8-27b";
 
 export const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1";
 export const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "gemma4:cloud";

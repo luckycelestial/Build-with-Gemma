@@ -3,6 +3,7 @@ import path from 'path';
 import { exec } from 'child_process';
 import Parser from 'rss-parser';
 import { AIService } from './ai';
+import { getPythonExecutable } from './python';
 
 const rssParser = new Parser();
 
@@ -222,7 +223,8 @@ export const FALLBACK_NEWS = [
 export function runPythonAnalysis(filePath: string, ordersMult = 1.0, steelMult = 1.0, delayMod = 0.0, utilMult = 1.0): Promise<any> {
   return new Promise((resolve, reject) => {
     const pythonScript = process.env.ML_ENGINE_SCRIPT_PATH || path.resolve(process.cwd(), 'services/ml-engine/analyze.py');
-    let command = `python "${pythonScript}" "${filePath}"`;
+    const pythonExe = getPythonExecutable();
+    let command = `"${pythonExe}" "${pythonScript}" "${filePath}"`;
     if (ordersMult !== 1.0) command += ` --orders-mult ${ordersMult}`;
     if (steelMult !== 1.0) command += ` --steel-mult ${steelMult}`;
     if (delayMod !== 0.0) command += ` --delay-mod ${delayMod}`;

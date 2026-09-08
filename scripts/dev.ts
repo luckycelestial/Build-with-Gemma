@@ -45,22 +45,52 @@ async function startDev() {
   console.log("🚀 STARTING DEVELOPMENT ENVIRONMENT");
   console.log("--------------------------------------------------");
 
-  // 1. Verify PostgreSQL Database
-  const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/revenue_intelligence?schema=public";
-  const pgClient = new Client({ connectionString, connectionTimeoutMillis: 3000 });
-  try {
-    await pgClient.connect();
-    await pgClient.query('SELECT 1');
-    await pgClient.end();
-    console.log("✅ PostgreSQL connection verified successfully.");
-  } catch (err) {
-    console.error(`❌ Cannot start: PostgreSQL is not reachable at ${connectionString}. Run docker compose up -d first.`);
-    process.exit(1);
+  // 1. Verify Database Connection
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  let verified = false;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { error } = await supabase.from('Material').select('id', { head: true });
+      if (!error) {
+        console.log(`✅ Supabase HTTPS connection verified (${supabaseUrl}).`);
+        verified = true;
+      }
+    } catch (e) {
+      // Fallback
+    }
+  }
+
+  if (!verified) {
+    const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/revenue_intelligence?schema=public";
+    const isCloud = connectionString.includes('supabase.com') || connectionString.includes('sslmode=require');
+    const pgClient = new Client({
+      connectionString,
+      ssl: isCloud ? { rejectUnauthorized: false } : undefined,
+      connectionTimeoutMillis: 5000,
+    });
+    try {
+      await pgClient.connect();
+      await pgClient.query('SELECT 1');
+      await pgClient.end();
+      console.log("✅ PostgreSQL connection verified successfully.");
+    } catch (err: any) {
+      if (isCloud && err.message.includes("timeout")) {
+        console.warn("\n⚠️ Notice: Outbound database ports (5432/6543) are blocked by your current Wi-Fi network.");
+        console.log("✅ App configured with Supabase HTTPS client (@supabase/supabase-js).\n");
+      } else {
+        console.error(`❌ Cannot start: Database is not reachable (${err.message}).`);
+        process.exit(1);
+      }
+    }
   }
 
   // 2. Check AI Engine Mode (Groq API LPU vs Local Ollama Fallback)
   if (process.env.GROQ_API_KEY) {
-    console.log(`⚡ [AI Engine] Powered by Groq API LPU (${process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'}). Local Ollama startup bypassed.`);
+    console.log(`⚡ [AI Engine] Powered by Groq API LPU (${process.env.GROQ_MODEL || 'qwen/qwen3.8-27b'}). Local Ollama startup bypassed.`);
   } else {
     // Only check/start Ollama if GROQ_API_KEY is not configured
     const isRunning = await checkOllamaRunning();

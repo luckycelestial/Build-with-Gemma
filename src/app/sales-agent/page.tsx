@@ -219,16 +219,38 @@ export default function SalesAgentPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Faster polling when QR modal is active
+  useEffect(() => {
+    if (!showQrModal || waConnected) return;
+    pollWhatsAppStatus();
+    const qrInterval = setInterval(() => {
+      pollWhatsAppStatus();
+    }, 1500);
+    return () => clearInterval(qrInterval);
+  }, [showQrModal, waConnected]);
+
   // Connect WhatsApp
   const handleConnectWhatsApp = async () => {
     setConnecting(true);
     setShowQrModal(true);
     try {
-      await fetch('/api/whatsapp/status', { method: 'POST' });
+      const res = await fetch('/api/whatsapp/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: waConnected ? 'reset' : 'connect' })
+      });
+      const data = await res.json();
+      if (data.success && data.status) {
+        setWaConnected(Boolean(data.status.connected));
+        if (data.status.qr) {
+          setQrCodeUrl(data.status.qr);
+        }
+      }
     } catch (e) {
       console.error('[Connect WA error]:', e);
     } finally {
       setConnecting(false);
+      pollWhatsAppStatus();
     }
   };
 

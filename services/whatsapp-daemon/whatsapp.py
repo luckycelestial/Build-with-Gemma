@@ -4,9 +4,10 @@ import time
 import json
 import threading
 import requests
+import segno
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from neonize.client import NewClient
-from neonize.events import ConnectedEv, MessageEv, QREv
+from neonize.events import ConnectedEv, MessageEv, PairStatusEv, LoggedOutEv
 from neonize.utils.jid import JID, build_jid
 
 # Reconfigure stdout/stderr to use utf-8 to prevent encoding crashes on Windows terminal
@@ -62,32 +63,56 @@ def outbound_worker():
 threading.Thread(target=outbound_worker, daemon=True).start()
 
 def setup_client_events(cl):
-    @cl.event(QREv)
-    def on_qr(_: NewClient, qr_ev: QREv):
-        if qr_ev.Codes:
-            qr_str = qr_ev.Codes[0]
-            whatsapp_state["qr"] = qr_str
+    @cl.qr
+    def on_qr(_: NewClient, data_qr: bytes):
+        try:
+            qr_uri = segno.make_qr(data_qr).png_data_uri(scale=8)
+            whatsapp_state["qr"] = qr_uri
             whatsapp_state["connected"] = False
-            print(f"\n[QR CODE GENERATED] Fresh QR code ready for UI scanning.")
+            print(f"\n[QR CODE GENERATED] Fresh QR code ready for UI scanning (URI len: {len(qr_uri)}).")
+            # Also render to terminal
+            try:
+                segno.make_qr(data_qr).terminal(compact=True)
+            except Exception:
+                pass
+        except Exception as qr_err:
+            print(f"❌ [QR GEN ERROR] {qr_err}")
 
     @cl.event(ConnectedEv)
     def on_connected(c: NewClient, _: ConnectedEv):
+        is_logged_in = bool(hasattr(c, "is_logged_in") and c.is_logged_in)
+        whatsapp_state["connected"] = is_logged_in
+        if is_logged_in:
+            whatsapp_state["qr"] = None
+            phone_number = "Active"
+            try:
+                if hasattr(c, "me") and c.me:
+                    if hasattr(c.me, "JID") and c.me.JID and hasattr(c.me.JID, "User") and c.me.JID.User:
+                        phone_number = c.me.JID.User
+                    elif hasattr(c.me, "User") and c.me.User:
+                        phone_number = c.me.User
+                elif hasattr(c, "store") and c.store and hasattr(c.store, "ID") and c.store.ID:
+                    phone_number = getattr(c.store.ID, "User", "Active")
+            except Exception as e:
+                print(f"[WARN] Could not parse phone number: {e}")
+            
+            whatsapp_state["phone"] = phone_number
+            print(f"\n🟢 [CONNECTED] WhatsApp session active for phone +{phone_number}")
+
+    @cl.event(PairStatusEv)
+    def on_pair_status(c: NewClient, pair_ev: PairStatusEv):
+        print(f"\n🟢 [PAIR STATUS] WhatsApp paired successfully: {pair_ev.ID.User if hasattr(pair_ev, 'ID') and hasattr(pair_ev.ID, 'User') else ''}")
         whatsapp_state["connected"] = True
         whatsapp_state["qr"] = None
-        phone_number = "Active"
-        try:
-            if hasattr(c, "me") and c.me:
-                if hasattr(c.me, "JID") and c.me.JID and hasattr(c.me.JID, "User") and c.me.JID.User:
-                    phone_number = c.me.JID.User
-                elif hasattr(c.me, "User") and c.me.User:
-                    phone_number = c.me.User
-            elif hasattr(c, "store") and c.store and hasattr(c.store, "ID") and c.store.ID:
-                phone_number = getattr(c.store.ID, "User", "Active")
-        except Exception as e:
-            print(f"[WARN] Could not parse phone number: {e}")
-        
-        whatsapp_state["phone"] = phone_number
-        print(f"\n🟢 [CONNECTED] WhatsApp session active for phone +{phone_number}")
+        if hasattr(pair_ev, "ID") and hasattr(pair_ev.ID, "User") and pair_ev.ID.User:
+            whatsapp_state["phone"] = pair_ev.ID.User
+
+    @cl.event(LoggedOutEv)
+    def on_logged_out(c: NewClient, _: LoggedOutEv):
+        print("\n🔴 [LOGGED OUT] WhatsApp session was logged out.")
+        whatsapp_state["connected"] = False
+        whatsapp_state["phone"] = None
+        whatsapp_state["qr"] = None
 
     @cl.event(MessageEv)
     def on_message(_: NewClient, message: MessageEv):
@@ -149,11 +174,12 @@ class DaemonHTTPHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/status":
             try:
-                if (hasattr(client, "is_logged_in") and client.is_logged_in) or (hasattr(client, "is_connected") and client.is_connected):
-                    whatsapp_state["connected"] = True
+                is_logged_in = bool(hasattr(client, "is_logged_in") and client.is_logged_in)
+                whatsapp_state["connected"] = is_logged_in
+                if is_logged_in:
                     whatsapp_state["qr"] = None
                     if not whatsapp_state["phone"] or whatsapp_state["phone"] == "Unknown":
-                        if hasattr(client, "me") and client.me and hasattr(client.me, "JID") and client.me.JID:
+                        if hasattr(client, "me") and client.me and hasattr(client.me, "JID") and client.me.JID and client.me.JID.User:
                             whatsapp_state["phone"] = client.me.JID.User
                         else:
                             whatsapp_state["phone"] = "Active"
@@ -239,9 +265,12 @@ class DaemonHTTPHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+class ReusableHTTPServer(HTTPServer):
+    allow_reuse_address = True
+
 def run_http_server():
     server_address = ('', 5001)
-    httpd = HTTPServer(server_address, DaemonHTTPHandler)
+    httpd = ReusableHTTPServer(server_address, DaemonHTTPHandler)
     print("🚀 [DAEMON SERVER] Daemon HTTP API listening on http://localhost:5001")
     httpd.serve_forever()
 

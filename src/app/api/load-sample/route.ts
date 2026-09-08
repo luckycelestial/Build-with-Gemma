@@ -10,6 +10,7 @@ import {
   queryGemmaAnalysis,
   DEFAULT_BUSINESS_DATA
 } from '@/lib/revenue-orchestrator';
+import { getPythonExecutable } from '@/lib/python';
 export const dynamic = "force-dynamic";
 
 export async function POST() {
@@ -19,8 +20,9 @@ export async function POST() {
   // Verify sample data exists. If not, auto generate it using Python script
   if (!fs.existsSync(samplePath)) {
     const pythonScript = path.join(mlDir, 'analyze.py');
+    const pythonExe = getPythonExecutable();
     await new Promise<void>((resolve) => {
-      exec(`python "${pythonScript}" --generate-only`, () => resolve());
+      exec(`"${pythonExe}" "${pythonScript}" --generate-only`, () => resolve());
     });
   }
 

@@ -4,11 +4,17 @@ import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://postgres:salmon%4011@localhost:5432/revenue_intelligence?schema=public";
+const connectionString = process.env.DATABASE_URL || "";
 
-const pool = new Pool({ connectionString });
+const isCloudDb =
+  connectionString.includes("supabase.com") ||
+  connectionString.includes("sslmode=require") ||
+  connectionString.includes("pooler.supabase.com");
+
+const pool = new Pool({
+  connectionString: connectionString || undefined,
+  ssl: isCloudDb ? { rejectUnauthorized: false } : undefined,
+});
 const adapter = new PrismaPg(pool);
 
 export const prisma =

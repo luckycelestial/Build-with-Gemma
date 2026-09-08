@@ -245,6 +245,16 @@ export default function RealWhatsAppSupplierAgentPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fast polling when QR modal is active
+  useEffect(() => {
+    if (!showQrModal || waConnected) return;
+    pollWhatsAppStatus();
+    const qrInterval = setInterval(() => {
+      pollWhatsAppStatus();
+    }, 1500);
+    return () => clearInterval(qrInterval);
+  }, [showQrModal, waConnected]);
+
   // Connect WhatsApp Button Click
   const handleConnectWhatsApp = async () => {
     setConnecting(true);
